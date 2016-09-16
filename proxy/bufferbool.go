@@ -10,7 +10,7 @@ func NewBufferPool() *BufferPool {
 	return &BufferPool{
 		pool: sync.Pool{
 			New: func() interface{} {
-				return []byte{}
+				return make([]byte, 32*1024)
 			},
 		},
 	}
