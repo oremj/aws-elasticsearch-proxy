@@ -81,7 +81,7 @@ func (e *ElasticSearch) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	resp, err := http.DefaultClient.Do(newreq)
 	if err != nil {
-		log.Println("making request: %v", err)
+		log.Printf("making request: %v", err)
 		http.Error(w, "AWS Error", http.StatusBadGateway)
 		return
 	}
