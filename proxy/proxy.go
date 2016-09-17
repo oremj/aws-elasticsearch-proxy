@@ -120,7 +120,6 @@ var hopHeaders = []string{
 func copyHeader(dst, src http.Header) {
 	for k, vv := range src {
 		for _, v := range vv {
-			log.Printf("Copying: %s, %s", k, v)
 			dst.Add(k, v)
 		}
 	}
