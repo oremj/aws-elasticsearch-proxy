@@ -79,16 +79,20 @@ func (e *ElasticSearch) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp, err := http.DefaultClient.Do(newreq)
+	resp, err := http.DefaultTransport.RoundTrip(newreq)
 	if err != nil {
 		log.Printf("making request: %v", err)
 		http.Error(w, "AWS Error", http.StatusBadGateway)
 		return
 	}
+
 	for _, h := range hopHeaders {
 		resp.Header.Del(h)
 	}
 	copyHeader(w.Header(), resp.Header)
+
+	w.WriteHeader(resp.StatusCode)
+
 	if resp.Body != nil {
 		e.copy(w, resp.Body)
 	}
@@ -116,6 +120,7 @@ var hopHeaders = []string{
 func copyHeader(dst, src http.Header) {
 	for k, vv := range src {
 		for _, v := range vv {
+			log.Printf("Copying: %s, %s", k, v)
 			dst.Add(k, v)
 		}
 	}
