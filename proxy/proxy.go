@@ -33,12 +33,12 @@ func NewElasticSearch(endpoint, region string, signer *v4.Signer) *ElasticSearch
 
 // req.Body will be closed after this.
 func (e *ElasticSearch) buildRequest(req *http.Request) (*http.Request, error) {
-	var body *bytes.Buffer
-	if req.Body != nil {
-		body = new(bytes.Buffer)
-		e.copy(body, req.Body)
-		req.Body.Close()
+	// Server requests Body will always be non-nil
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading request: %v", err)
 	}
+	req.Body.Close()
 
 	newreq := &http.Request{
 		Method: req.Method,
@@ -52,11 +52,11 @@ func (e *ElasticSearch) buildRequest(req *http.Request) (*http.Request, error) {
 		ProtoMinor: 1,
 		ProtoMajor: 1,
 		Header:     make(http.Header),
-		Body:       ioutil.NopCloser(body),
+		Body:       ioutil.NopCloser(bytes.NewReader(body)),
 		Host:       e.Endpoint,
 	}
 	if body != nil {
-		newreq.ContentLength = int64(body.Len())
+		newreq.ContentLength = int64(len(body))
 	}
 
 	copyHeader(newreq.Header, req.Header)
@@ -64,7 +64,7 @@ func (e *ElasticSearch) buildRequest(req *http.Request) (*http.Request, error) {
 		newreq.Header.Del(h)
 	}
 
-	_, err := e.Signer.Sign(newreq, bytes.NewReader(body.Bytes()), "es", e.Region, time.Now())
+	_, err = e.Signer.Sign(newreq, bytes.NewReader(body), "es", e.Region, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("Error Signing Request: %v", err)
 	}
