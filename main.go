@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
@@ -16,6 +18,11 @@ var region = flag.String("region", "us-east-1", "AWS region")
 
 func main() {
 	flag.Parse()
+	if *esEndpoint == "" {
+		fmt.Println("-es-endpoint must be defined\n")
+		flag.Usage()
+		os.Exit(2)
+	}
 	signer := v4.NewSigner(defaults.Get().Config.Credentials)
 	es := proxy.NewElasticSearch(*esEndpoint, *region, signer)
 	log.Fatal(http.ListenAndServe(*addr, es))
