@@ -46,6 +46,7 @@ func (e *ElasticSearch) buildRequest(req *http.Request) (*http.Request, error) {
 			Scheme:   "https",
 			Host:     e.Endpoint,
 			Path:     req.URL.Path,
+			RawPath:  req.URL.RawPath,
 			RawQuery: req.URL.RawQuery,
 		},
 		Proto:      "HTTP/1.1",
