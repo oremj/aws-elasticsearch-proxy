@@ -115,6 +115,9 @@ var hopHeaders = []string{
 	"Te",      // canonicalized version of "TE"
 	"Trailer", // not Trailers per URL above; http://www.rfc-editor.org/errata_search.php?eid=4522
 	"Transfer-Encoding",
+	"X-Forwarded-For",
+	"X-Forwarded-Proto",
+	"X-Real-Ip",
 	"Upgrade",
 }
 
